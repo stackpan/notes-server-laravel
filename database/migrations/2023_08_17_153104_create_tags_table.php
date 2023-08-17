@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notes', function (Blueprint $table) {
-            $table->ulid('id')->primary();
-            $table->string('title', 100);
-            $table->text('body')->nullable();
-            $table->timestamps();
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('body', 20);
+            $table->ulid('taggable_id');
+            $table->string('taggable_type');
         });
     }
 
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('notes');
+        Schema::dropIfExists('tags');
     }
 };
