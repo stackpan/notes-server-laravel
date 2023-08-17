@@ -40,4 +40,15 @@ class UserFactory extends Factory
             'password' => 'Secret123!'
         ]);
     }
+
+    public function random(): Factory
+    {
+        return $this->state(fn (array $attributes) => [
+            'username' => fake()->userName(),
+            'password' => Hash::make('Secret123!'),
+            'email' => fake()->email(),
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
+        ]);
+    }
 }

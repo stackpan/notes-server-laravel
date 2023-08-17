@@ -3,21 +3,14 @@
 namespace App\Http\Requests;
 
 use Illuminate\Validation\Rule;
+use App\Traits\MustAuthenticated;
 use App\Traits\HasFailedValidation;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UserUpdateRequest extends FormRequest
 {
-    use HasFailedValidation;
-
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return $this->user() !== null;
-    }
+    use HasFailedValidation, MustAuthenticated;
 
     /**
      * Get the validation rules that apply to the request.

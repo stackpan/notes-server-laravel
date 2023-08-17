@@ -32,7 +32,7 @@ paths:
                 phone:
                   type: string
       responses:
-        "200":
+        "201":
           description: "Success create contact"
           content:
             application/json:
@@ -46,6 +46,64 @@ paths:
                         type: number
                   errors:
                     type: object
+        "400":
+          description: "Validation error response"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+              examples:
+                "firstName field invalid error":
+                  value:
+                    errors:
+                      firstName:
+                        - "firstName is required"
+                        - "firstName max 100 character length"
+                "lastName field invalid error":
+                  value:
+                    errors:
+                      lastName:
+                        - "lastName max 100 character length"
+                "email field invalid error":
+                  value:
+                    errors:
+                      email:
+                        - "email must be valid email format"
+                "phone field invalid error":
+                  value:
+                    errors:
+                      phone:
+                        - "phone max 20 character length"
+                "Combination error 1":
+                  value:
+                    errors:
+                      firstName:
+                        - "firstName is required"
+                        - "firstName max 100 character length"
+                      email:
+                        - "email must be valid email format"
+                "Combination error 2":
+                  value:
+                    errors:
+                      lastName:
+                        - "lastName max 100 character length"
+                      email:
+                        - "email must be valid email format"
+                      phone:
+                        - "phone max 20 character length"
+        "401":
+          description: "Unauthenticated error"
+          content:
+            application/json:
+              examples:
+                "Unauthenticated user cannot access the resource":
+                  value:
+                    errors:
+                      message: "Unauthorized."
+
     get:
       description: "Search contact"
       parameters:
@@ -100,6 +158,15 @@ paths:
                     type: object
                   meta:
                     type: object
+        "401":
+          description: "Unauthenticated error"
+          content:
+            application/json:
+              examples:
+                "Unauthenticated user cannot access the resource":
+                  value:
+                    errors:
+                      message: "Unauthorized."
 
   "/api/contacts/{id}":
     put:
@@ -143,6 +210,63 @@ paths:
                         type: number
                   errors:
                     type: object
+        "400":
+          description: "Validation error response"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+              examples:
+                "firstName field invalid error":
+                  value:
+                    errors:
+                      firstName:
+                        - "firstName is required"
+                        - "firstName max 100 character length"
+                "lastName field invalid error":
+                  value:
+                    errors:
+                      lastName:
+                        - "lastName max 100 character length"
+                "email field invalid error":
+                  value:
+                    errors:
+                      email:
+                        - "email must be valid email format"
+                "phone field invalid error":
+                  value:
+                    errors:
+                      phone:
+                        - "phone max 20 character length"
+                "Combination error 1":
+                  value:
+                    errors:
+                      firstName:
+                        - "firstName is required"
+                        - "firstName max 100 character length"
+                      email:
+                        - "email must be valid email format"
+                "Combination error 2":
+                  value:
+                    errors:
+                      lastName:
+                        - "lastName max 100 character length"
+                      email:
+                        - "email must be valid email format"
+                      phone:
+                        - "phone max 20 character length"
+        "401":
+          description: "Unauthenticated error"
+          content:
+            application/json:
+              examples:
+                "Unauthenticated user cannot access the resource":
+                  value:
+                    errors:
+                      message: "Unauthorized."
     get:
       description: "Get contact"
       parameters:
@@ -178,6 +302,24 @@ paths:
                         type: string
                   errors:
                     type: object
+        "404":
+          description: "Not found error"
+          content:
+            application/json:
+              examples:
+                "Not found response":
+                  value:
+                    errors:
+                      message: "Resource not found."
+        "401":
+          description: "Unauthenticated error"
+          content:
+            application/json:
+              examples:
+                "Unauthenticated user cannot access the resource":
+                  value:
+                    errors:
+                      message: "Unauthorized."
     delete:
       description: "Delete contact"
       parameters:
@@ -202,3 +344,21 @@ paths:
                     type: boolean
                   errors:
                     type: object
+        "404":
+          description: "Not found error"
+          content:
+            application/json:
+              examples:
+                "Not found response":
+                  value:
+                    errors:
+                      message: "Resource not found."
+        "401":
+          description: "Unauthenticated error"
+          content:
+            application/json:
+              examples:
+                "Unauthenticated user cannot access the resource":
+                  value:
+                    errors:
+                      message: "Unauthorized."

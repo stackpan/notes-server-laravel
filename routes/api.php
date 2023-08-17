@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\ApiAuthenticate;
+use App\Http\Controllers\ContactController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,4 +29,13 @@ Route::middleware(ApiAuthenticate::class)->group(function () {
     Route::put('/users/current', [UserController::class, 'update']);
     Route::patch('/users/current/password', [UserController::class, 'updatePassword']);
     Route::delete('/auth/logout', [UserController::class, 'logout']);
+
+    Route::post('/contacts', [ContactController::class, 'create']);
+    Route::get('/contacts', [ContactController::class, 'search']);
+    Route::get('/contacts/{contact}', [ContactController::class, 'get'])
+        ->where('contact', '[0-9]+');
+    Route::put('/contacts/{contact}', [ContactController::class, 'update'])
+        ->where('contact', '[0-9]+');
+    Route::delete('/contacts/{contact}', [ContactController::class, 'delete'])
+        ->where('contact', '[0-9]+');
 });

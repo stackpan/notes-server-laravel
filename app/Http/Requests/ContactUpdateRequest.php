@@ -4,10 +4,9 @@ namespace App\Http\Requests;
 
 use App\Traits\MustAuthenticated;
 use App\Traits\HasFailedValidation;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserUpdatePasswordRequest extends FormRequest
+class ContactUpdateRequest extends FormRequest
 {
     use HasFailedValidation, MustAuthenticated;
 
@@ -19,7 +18,10 @@ class UserUpdatePasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'password' => ['required', 'max:100', Password::defaults()],
+            'firstName' => ['required', 'max:100'],
+            'lastName' => ['nullable', 'max:100'],
+            'email' => ['nullable', 'max:200', 'email'],
+            'phone' => ['nullable', 'max:20'],
         ];
     }
 }
