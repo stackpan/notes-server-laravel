@@ -1,0 +1,219 @@
+openapi: 3.0.3
+info:
+  title: Notes API Back-End
+  description: Notes API Back-End
+  version: 1.0.0
+servers:
+  - url: 'http://localhost'
+paths:
+  /api/notes:
+    post:
+      description: Create note
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+                body:
+                  type: string
+      responses:
+        201:
+          description: Success response
+          content:
+            application/json:
+              example:
+                status: success
+                message: 'Catatan berhasil ditambahkan'
+                data:
+                  noteId: note_id
+        500:
+          description: Failed response
+          content:
+            application/json:
+              example:
+                status: error
+                message: 'Catatan gagal untuk ditambahkan'
+    get:
+      description: Get notes
+      responses:
+        200:
+          description: Success response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      notes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            title:
+                              type: string
+                            body:
+                              type: string
+                            tags:
+                              type: array
+                              items:
+                                type: string
+                            createdAt:
+                              type: string
+                            updatedAt:
+                              type: string
+              examples:
+                Have notes:
+                  value:
+                    status: success
+                    data:
+                      notes:
+                        - id: note_id
+                          title: note_title
+                          body: note_body
+                          tags:
+                            - note_tag1
+                            - note_tag2
+                          createdAt: note_createdAt
+                          updatedAt: note_updatedAt
+                        - id: note_id
+                          title: note_title
+                          body: note_body
+                          tags:
+                            - note_tag1
+                            - note_tag2
+                          createdAt: note_createdAt
+                          updatedAt: note_updatedAt
+                Empty notes:
+                  value:
+                    status: success
+                    data:
+                      notes:
+                        -
+  /api/notes/{id}:
+    get:
+      description: Get specific note
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      note:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          title:
+                            type: string
+                          body:
+                            type: string
+                          tags:
+                            type: array
+                            items:
+                              type: string
+                          createdAt:
+                            type: string
+                          updatedAt:
+                            type: string
+              example:
+                status: success
+                data:
+                  note:
+                    id: note_id
+                    title: note_title
+                    createdAt: note_createdAt
+                    updatedAt: note_updatedAt
+                    tags:
+                      - note_tag1
+                      - note_tag2
+                    body: note_body
+        404:
+          description: Not found response
+          content:
+            application/json:
+              example:
+                status: fail
+                message: Catatan tidak ditemukan
+    put:
+      description: Update note
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+                body:
+                  type: string
+      responses:
+        200:
+          description: Success response
+          content:
+            application/json:
+              example:
+                status: success
+                message: 'Catatan berhasil diperbarui'
+        404:
+          description: Not found response
+          content:
+            application/json:
+              example:
+                status: fail
+                message: Gagal memperbarui catatan. Id catatan tidak ditemukan
+    delete:
+      description: delete note
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+      responses:
+          200:
+            description: Success response
+            content:
+              application/json:
+                example:
+                  status: success
+                  message: 'Catatan berhasil dihapus'
+          404:
+            description: Not found response
+            content:
+              application/json:
+                example:
+                  status: fail
+                  message: Catatan gagal dihapus. Id catatan tidak ditemukan
