@@ -2,20 +2,33 @@
 
 namespace Tests\Feature\Api;
 
-use App\Http\Controllers\Api\NoteController;
 use App\Models\Note;
-use http\Env\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Str;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponse;
-use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class NoteTest extends TestCase
 {
     use RefreshDatabase;
+
+    public static function noteJsonAsserter(array $note): callable
+    {
+        return fn (AssertableJson $json) => $json
+            ->whereAll([
+                'id' => $note['id'],
+                'title' => $note['title'],
+                'body' => $note['body'],
+                'createdAt' => $note['created_at'],
+                'updatedAt' => $note['updated_at'],
+                'tags' => collect($note['tags'])
+                    ->map(fn (array $item, int $key) => $item['body'])
+                    ->toArray(),
+            ]);
+    }
 
     public static function createSuccessProvider(): array
     {
@@ -149,18 +162,7 @@ class NoteTest extends TestCase
             ->assertJson(fn (AssertableJson $json) => $json
                 ->where('status', 'success')
                 ->whereType('data.notes', 'array')
-                ->has('data.notes', 4, fn (AssertableJson $json) => $json
-                    ->whereAll([
-                        'id' => $firstNote['id'],
-                        'title' => $firstNote['title'],
-                        'body' => $firstNote['body'],
-                        'createdAt' => $firstNote['created_at'],
-                        'updatedAt' => $firstNote['updated_at'],
-                        'tags' => collect($firstNote['tags'])
-                            ->map(fn (array $item, int $key) => $item['body'])
-                            ->toArray(),
-                    ]),
-                )
+                ->has('data.notes', 4, NoteTest::noteJsonAsserter($firstNote))
             );
     }
 
@@ -177,5 +179,37 @@ class NoteTest extends TestCase
                     'notes' => []
                 ]
             ]);
+    }
+
+    public function testGetDetailSuccess(): void
+    {
+        $note = Note::factory()
+            ->hasTags(3)
+            ->create()
+            ->load('tags')
+            ->toArray();
+
+        $response = $this
+            ->get('/api/notes/' . $note['id']);
+
+        $response
+            ->assertStatus(200)
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->where('status', 'success')
+                ->has('data.note', NoteTest::noteJsonAsserter($note))
+            );
+    }
+
+    public function testGetDetailNotFound(): void
+    {
+        $response = $this
+            ->get('/api/notes/' . Str::ulid());
+
+        $response
+            ->assertStatus(404)
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->where('status', 'fail')
+                ->whereType('message', 'string')
+            );
     }
 }
