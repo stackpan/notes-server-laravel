@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\NoteCreateRequest;
+use App\Http\Requests\NoteUpdateRequest;
 use App\Http\Resources\NoteCollection;
 use App\Http\Resources\NoteResource;
 use App\Models\Note;
@@ -61,6 +62,33 @@ class NoteController extends Controller
             'data' => [
                 'note' => new NoteResource($note)
             ]
+        ]);
+    }
+
+    public function update(NoteUpdateRequest $request, string $id)
+    {
+        if (!$note = Note::find($id)) {
+            throw new HttpResponseException(response()->json([
+                'status' => 'fail',
+                'message' => 'Gagal memperbarui catatan. Id catatan tidak ditemukan'
+            ], 404));
+        }
+
+        $validated = $request->validated();
+
+        $note->fill([
+            'title' => $validated['title'],
+            'body' => $validated['body'] ?? null,
+        ]);
+
+        $note->tags()->delete();
+        foreach ($validated['tags'] as $tag) {
+            $note->tags()->create(['body' => $tag]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Catatan berhasil diperbarui',
         ]);
     }
 

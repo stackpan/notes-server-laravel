@@ -24,10 +24,15 @@ class NoteTest extends TestCase
                 'body' => $note['body'],
                 'createdAt' => $note['created_at'],
                 'updatedAt' => $note['updated_at'],
-                'tags' => collect($note['tags'])
-                    ->map(fn (array $item, int $key) => $item['body'])
-                    ->toArray(),
+                'tags' => self::mapTags($note['tags']),
             ]);
+    }
+
+    public static function mapTags(array $tags): array
+    {
+        return collect($tags)
+            ->map(fn (array $item, int $key) => $item['body'])
+            ->toArray();
     }
 
     public static function createSuccessProvider(): array
@@ -162,7 +167,7 @@ class NoteTest extends TestCase
             ->assertJson(fn (AssertableJson $json) => $json
                 ->where('status', 'success')
                 ->whereType('data.notes', 'array')
-                ->has('data.notes', 4, NoteTest::noteJsonAsserter($firstNote))
+                ->has('data.notes', 4, self::noteJsonAsserter($firstNote))
             );
     }
 
@@ -196,7 +201,7 @@ class NoteTest extends TestCase
             ->assertStatus(200)
             ->assertJson(fn (AssertableJson $json) => $json
                 ->where('status', 'success')
-                ->has('data.note', NoteTest::noteJsonAsserter($note))
+                ->has('data.note', self::noteJsonAsserter($note))
             );
     }
 
@@ -204,6 +209,49 @@ class NoteTest extends TestCase
     {
         $response = $this
             ->get('/api/notes/' . Str::ulid());
+
+        $response
+            ->assertStatus(404)
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->where('status', 'fail')
+                ->whereType('message', 'string')
+            );
+    }
+
+    public function testUpdateSuccess(): void
+    {
+        $note = Note::factory()
+            ->hasTags(3)
+            ->create()
+            ->load('tags')
+            ->toArray();
+
+        $response = $this
+            ->put('/api/notes/' . $note['id'], [
+                'title' => $note['title'],
+                'body' => fake()->paragraph(),
+                'tags' => self::mapTags($note['tags']),
+            ]);
+
+        $response
+            ->assertStatus(200)
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->where('status', 'success')
+                ->whereType('message', 'string')
+            );
+
+        $updatedNote = Note::find($note['id'])->load('tags')->toArray();
+        $this->assertNotSame($note, $updatedNote);
+    }
+
+    public function testUpdateNotFound(): void
+    {
+        $response = $this
+            ->put('/api/notes/' . Str::ulid(), [
+                'title' => fake()->sentence(3),
+                'body' => fake()->paragraph(),
+                'tags' => fake()->words(3),
+            ]);
 
         $response
             ->assertStatus(404)
