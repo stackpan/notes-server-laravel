@@ -76,16 +76,17 @@ class NoteController extends Controller
 
         $validated = $request->validated();
 
-        $note->fill([
-            'title' => $validated['title'],
-            'body' => $validated['body'] ?? null,
-        ]);
+        $note
+            ->fill([
+                'title' => $validated['title'],
+                'body' => $validated['body'] ?? null,
+            ])
+            ->save();
 
         $note->tags()->delete();
         foreach ($validated['tags'] as $tag) {
             $note->tags()->create(['body' => $tag]);
         }
-
         return response()->json([
             'status' => 'success',
             'message' => 'Catatan berhasil diperbarui',

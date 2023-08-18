@@ -241,7 +241,7 @@ class NoteTest extends TestCase
             );
 
         $updatedNote = Note::find($note['id'])->load('tags')->toArray();
-        $this->assertNotSame($note, $updatedNote);
+        $this->assertNotEquals($note, $updatedNote);
     }
 
     public function testUpdateNotFound(): void
@@ -267,7 +267,7 @@ class NoteTest extends TestCase
             );
 
         $updatedNote = Note::find($note['id'])->load('tags')->toArray();
-        $this->assertSame($note, $updatedNote);
+        $this->assertEquals($note, $updatedNote);
     }
 
     public function testDeleteSuccess(): void
