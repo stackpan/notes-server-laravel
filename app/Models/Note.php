@@ -11,6 +11,11 @@ class Note extends Model
 {
     use HasFactory, HasUlids;
 
+    protected $fillable = [
+        'title',
+        'body',
+    ];
+
     public function tags(): MorphMany
     {
         return $this->morphMany(Tag::class, 'taggable');

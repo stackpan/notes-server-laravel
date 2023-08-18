@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+//Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//    return $request->user();
+//});
+
+Route::post('/notes', [\App\Http\Controllers\Api\NoteController::class, 'create'])->name('api.notes.create');
+Route::get('/notes', [\App\Http\Controllers\Api\NoteController::class, 'get'])->name('api.notes.get');

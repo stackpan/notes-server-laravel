@@ -12,6 +12,14 @@ class Tag extends Model
 
     public $timestamps = false;
 
+    protected $visible = [
+        'body'
+    ];
+
+    protected $fillable = [
+        'body',
+    ];
+
     public function taggable(): MorphTo
     {
         return $this->morphTo();
