@@ -23,8 +23,11 @@ class NoteCreateRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:100'],
-            'tags' => ['nullable', 'array'],
-            'body' => ['nullable', 'string']
+            'tags' => ['required', 'array'],
+            'tags.*' => ['string', 'max:20'],
+            'body' => ['required', 'string'],
         ];
     }
+
+
 }

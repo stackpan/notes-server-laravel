@@ -4,10 +4,8 @@ namespace Tests\Feature\Api;
 
 use App\Models\Note;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
@@ -17,7 +15,7 @@ class NoteTest extends TestCase
 
     public static function noteJsonAsserter(array $note): callable
     {
-        return fn (AssertableJson $json) => $json
+        return fn(AssertableJson $json) => $json
             ->whereAll([
                 'id' => $note['id'],
                 'title' => $note['title'],
@@ -31,103 +29,73 @@ class NoteTest extends TestCase
     public static function mapTags(array $tags): array
     {
         return collect($tags)
-            ->map(fn (array $item, int $key) => $item['body'])
+            ->map(fn(array $item, int $key) => $item['body'])
             ->toArray();
     }
 
-    public static function createSuccessProvider(): array
+    public function testCreateSuccess(): void
     {
-        return [
-            'all field' => [
-                [
-                    'title' => fake()->sentence(3),
-                    'tags' => fake()->words(2),
-                    'body' => fake()->paragraph(),
-                ],
-                function (NoteTest $testCase, array $payload, TestResponse $response): void {
-                    $noteId = $response['data']['noteId'];
-
-                    $testCase->assertDatabaseHas('notes', [
-                        'id' => $noteId,
-                        'title' => $payload['title'],
-                        'body' => $payload['body'],
-                    ]);
-
-                    foreach ($payload['tags'] as $tag) {
-                        $testCase->assertDatabaseHas('tags', [
-                            'body' =>  $tag,
-                            'taggable_id' => $noteId,
-                        ]);
-                    }
-                }
-            ],
-            'partially (no body)' => [
-                [
-                    'title' => fake()->sentence(3),
-                    'tags' => fake()->words(2),
-                ],
-                function (NoteTest $testCase, array $payload, TestResponse $response): void {
-                    $noteId = $response['data']['noteId'];
-
-                    $testCase->assertDatabaseHas('notes', [
-                        'id' => $noteId,
-                        'title' => $payload['title'],
-                    ]);
-
-                    foreach ($payload['tags'] as $tag) {
-                        $testCase->assertDatabaseHas('tags', [
-                            'body' =>  $tag,
-                            'taggable_id' => $noteId,
-                        ]);
-                    }
-                }
-            ],
-            'partially (no tags)' => [
-                [
-                    'title' => fake()->sentence(3),
-                    'body' => fake()->paragraph(),
-                ],
-                function (NoteTest $testCase, array $payload, TestResponse $response): void {
-                    $noteId = $response['data']['noteId'];
-
-                    $testCase->assertDatabaseHas('notes', [
-                        'id' => $noteId,
-                        'title' => $payload['title'],
-                        'body' => $payload['body'],
-                    ]);
-                }
-            ],
-            'title only' => [
-                [
-                    'title' => fake()->sentence(3),
-                ],
-                function (NoteTest $testCase, array $payload, TestResponse $response): void {
-                    $noteId = $response['data']['noteId'];
-
-                    $testCase->assertDatabaseHas('notes', [
-                        'id' => $noteId,
-                        'title' => $payload['title'],
-                    ]);
-                }
-            ],
+        $payload = [
+            'title' => fake()->sentence(3),
+            'tags' => fake()->words(2),
+            'body' => fake()->paragraph(),
         ];
-    }
 
-    #[DataProvider('createSuccessProvider')]
-    public function testCreateSuccess(array $payload, callable $assertExtra): void
-    {
         $response = $this
             ->post('/api/notes', $payload);
 
         $response
             ->assertStatus(201)
-            ->assertJson(fn (AssertableJson $json) => $json
+            ->assertJson(fn(AssertableJson $json) => $json
                 ->where('status', 'success')
                 ->has('message')
                 ->has('data.noteId')
             );
 
-        $assertExtra($this, $payload, $response);
+        $noteId = $response['data']['noteId'];
+
+        $this->assertDatabaseHas('notes', [
+            'id' => $noteId,
+            'title' => $payload['title'],
+            'body' => $payload['body'],
+        ]);
+
+        foreach ($payload['tags'] as $tag) {
+            $this->assertDatabaseHas('tags', [
+                'body' => $tag,
+                'taggable_id' => $noteId,
+            ]);
+        }
+    }
+
+    public static function barPayloadsProvider(): array
+    {
+        return [
+            [
+                ["tags" => ["Android", "Web"], "body" => "Isi dari catatan A"],
+                ["title" => 1, "tags" => ["Android", "Web"], "body" => "Isi dari catatan A"],
+                ["title" => "Catatan A", "body" => "Isi dari catatan A"],
+                ["title" => "Catatan A", "tags" => [1, "2"], "body" => "Isi dari catatan A"],
+                ["title" => "Catatan A", "tags" => ["Android", "Web"]],
+                ["title" => "Catatan A", "tags" => ["Android", "Web"], "body" => true]
+            ]
+        ];
+    }
+
+    #[DataProvider('barPayloadsProvider')]
+    public function testCreateWithBadPayloads(array $payload)
+    {
+        $response = $this
+            ->post('/api/notes', $payload);
+
+        $response
+            ->assertStatus(400)
+            ->assertHeader('Content-Type', 'application/json; charset=utf-8')
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->where('status', 'fail')
+                ->has('message')
+                ->etc(),
+            );
     }
 
     public function testCreateFailed(): void
@@ -143,7 +111,7 @@ class NoteTest extends TestCase
 
         $response
             ->assertStatus(500)
-            ->assertJson(fn (AssertableJson $json) => $json
+            ->assertJson(fn(AssertableJson $json) => $json
                 ->where('status', 'error')
                 ->has('message')
             );
@@ -164,7 +132,7 @@ class NoteTest extends TestCase
 
         $response
             ->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json
+            ->assertJson(fn(AssertableJson $json) => $json
                 ->where('status', 'success')
                 ->whereType('data.notes', 'array')
                 ->has('data.notes', 4, self::noteJsonAsserter($firstNote))
@@ -199,7 +167,7 @@ class NoteTest extends TestCase
 
         $response
             ->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json
+            ->assertJson(fn(AssertableJson $json) => $json
                 ->where('status', 'success')
                 ->has('data.note', self::noteJsonAsserter($note))
             );
@@ -212,7 +180,7 @@ class NoteTest extends TestCase
 
         $response
             ->assertStatus(404)
-            ->assertJson(fn (AssertableJson $json) => $json
+            ->assertJson(fn(AssertableJson $json) => $json
                 ->where('status', 'fail')
                 ->whereType('message', 'string')
             );
@@ -235,13 +203,35 @@ class NoteTest extends TestCase
 
         $response
             ->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json
+            ->assertJson(fn(AssertableJson $json) => $json
                 ->where('status', 'success')
                 ->whereType('message', 'string')
             );
 
         $updatedNote = Note::find($note['id'])->load('tags')->toArray();
         $this->assertNotEquals($note, $updatedNote);
+    }
+
+    #[DataProvider('barPayloadsProvider')]
+    public function testUpdateWithBadPayloads(array $payload): void
+    {
+        $note = Note::factory()
+            ->hasTags(3)
+            ->create()
+            ->load('tags')
+            ->toArray();
+
+        $response = $this
+            ->put('/api/notes/' . $note['id'], $payload);
+
+        $response
+            ->assertStatus(400)
+            ->assertHeader('Content-Type', 'application/json; charset=utf-8')
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->where('status', 'fail')
+                ->has('message')
+                ->etc(),
+            );
     }
 
     public function testUpdateNotFound(): void
@@ -261,7 +251,7 @@ class NoteTest extends TestCase
 
         $response
             ->assertStatus(404)
-            ->assertJson(fn (AssertableJson $json) => $json
+            ->assertJson(fn(AssertableJson $json) => $json
                 ->where('status', 'fail')
                 ->whereType('message', 'string')
             );
@@ -281,7 +271,7 @@ class NoteTest extends TestCase
 
         $response
             ->assertStatus(200)
-            ->assertJson(fn (AssertableJson $json) => $json
+            ->assertJson(fn(AssertableJson $json) => $json
                 ->where('status', 'success')
                 ->whereType('message', 'string')
             );
@@ -300,7 +290,7 @@ class NoteTest extends TestCase
 
         $response
             ->assertStatus(404)
-            ->assertJson(fn (AssertableJson $json) => $json
+            ->assertJson(fn(AssertableJson $json) => $json
                 ->where('status', 'fail')
                 ->whereType('message', 'string')
             );
