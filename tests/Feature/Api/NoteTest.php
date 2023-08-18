@@ -246,11 +246,17 @@ class NoteTest extends TestCase
 
     public function testUpdateNotFound(): void
     {
+        $note = Note::factory()
+            ->hasTags(3)
+            ->create()
+            ->load('tags')
+            ->toArray();
+
         $response = $this
             ->put('/api/notes/' . Str::ulid(), [
-                'title' => fake()->sentence(3),
+                'title' => $note['title'],
                 'body' => fake()->paragraph(),
-                'tags' => fake()->words(3),
+                'tags' => self::mapTags($note['tags']),
             ]);
 
         $response
@@ -259,5 +265,46 @@ class NoteTest extends TestCase
                 ->where('status', 'fail')
                 ->whereType('message', 'string')
             );
+
+        $updatedNote = Note::find($note['id'])->load('tags')->toArray();
+        $this->assertSame($note, $updatedNote);
+    }
+
+    public function testDeleteSuccess(): void
+    {
+        $note = Note::factory()
+            ->hasTags(3)
+            ->create();
+
+        $response = $this
+            ->delete('/api/notes/' . $note->id);
+
+        $response
+            ->assertStatus(200)
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->where('status', 'success')
+                ->whereType('message', 'string')
+            );
+
+        $this->assertModelMissing($note);
+    }
+
+    public function testDeleteNotFound(): void
+    {
+        $note = Note::factory()
+            ->hasTags(3)
+            ->create();
+
+        $response = $this
+            ->delete('/api/notes/' . Str::ulid());
+
+        $response
+            ->assertStatus(404)
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->where('status', 'fail')
+                ->whereType('message', 'string')
+            );
+
+        $this->assertModelExists($note);
     }
 }

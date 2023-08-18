@@ -65,7 +65,7 @@ class NoteController extends Controller
         ]);
     }
 
-    public function update(NoteUpdateRequest $request, string $id)
+    public function update(NoteUpdateRequest $request, string $id): JsonResponse
     {
         if (!$note = Note::find($id)) {
             throw new HttpResponseException(response()->json([
@@ -89,6 +89,22 @@ class NoteController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Catatan berhasil diperbarui',
+        ]);
+    }
+
+    public function delete(string $id): JsonResponse
+    {
+        if (!$note = Note::find($id)) {
+            throw new HttpResponseException(response()->json([
+                'status' => 'fail',
+                'message' => 'Catatan gagal dihapus. Id catatan tidak ditemukan'
+            ], 404));
+        }
+
+        $note->delete();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Catatan berhasil dihapus',
         ]);
     }
 
