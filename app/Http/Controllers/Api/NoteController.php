@@ -29,20 +29,25 @@ class NoteController extends Controller
             }
         }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Catatan berhasil ditambahkan',
-            'data' => [
-                'noteId' => $note->id,
-            ]
-        ], 201);
+        return response()
+            ->json([
+                'status' => 'success',
+                'message' => 'Catatan berhasil ditambahkan',
+                'data' => [
+                    'noteId' => $note->id,
+                ]
+            ], 201);
     }
 
-    public function get(): NoteCollection
+    public function get(): JsonResponse
     {
         return (new NoteCollection(Note::all()))
             ->additional([
                 'status' => 'success',
+            ])
+            ->response()
+            ->withHeaders([
+                'Content-Type' => 'application/json; charset=utf-8',
             ]);
     }
 
@@ -57,12 +62,16 @@ class NoteController extends Controller
             ], 404));
         }
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'note' => new NoteResource($note)
-            ]
-        ]);
+        return response()
+            ->json([
+                'status' => 'success',
+                'data' => [
+                    'note' => new NoteResource($note)
+                ]
+            ])
+            ->withHeaders([
+                'Content-Type' => 'application/json; charset=utf-8',
+            ]);
     }
 
     public function update(NoteUpdateRequest $request, string $id): JsonResponse
@@ -87,10 +96,14 @@ class NoteController extends Controller
         foreach ($validated['tags'] as $tag) {
             $note->tags()->create(['body' => $tag]);
         }
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Catatan berhasil diperbarui',
-        ]);
+        return response()
+            ->json([
+                'status' => 'success',
+                'message' => 'Catatan berhasil diperbarui',
+            ])
+            ->withHeaders([
+                'Content-Type' => 'application/json; charset=utf-8',
+            ]);
     }
 
     public function delete(string $id): JsonResponse
@@ -103,10 +116,14 @@ class NoteController extends Controller
         }
 
         $note->delete();
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Catatan berhasil dihapus',
-        ]);
+        return response()
+            ->json([
+                'status' => 'success',
+                'message' => 'Catatan berhasil dihapus',
+            ])
+            ->withHeaders([
+                'Content-Type' => 'application/json; charset=utf-8',
+            ]);
     }
 
 }
