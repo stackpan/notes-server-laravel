@@ -26,6 +26,11 @@ paths:
       responses:
         201:
           description: Success created response
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: 'application/json; charset=utf-8'
           content:
             application/json:
               example:
@@ -35,16 +40,26 @@ paths:
                   noteId: note_id
         500:
           description: Failed response
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: 'application/json; charset=utf-8'
           content:
             application/json:
               example:
                 status: error
                 message: 'Catatan gagal untuk ditambahkan'
     get:
-      description: Get notes
+      description: Getting all notes
       responses:
         200:
           description: Success response
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: 'application/json; charset=utf-8'
           content:
             application/json:
               schema:
@@ -102,6 +117,13 @@ paths:
                     data:
                       notes:
                         -
+        401:
+          description: User unauthorized response
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: 'application/json; charset=utf-8'
   /api/notes/{id}:
     get:
       description: Get specific note
@@ -113,6 +135,11 @@ paths:
       responses:
         200:
           description: Success response
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: 'application/json; charset=utf-8'
           content:
             application/json:
               schema:
@@ -154,6 +181,11 @@ paths:
                     body: note_body
         404:
           description: Not found response
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: 'application/json; charset=utf-8'
           content:
             application/json:
               example:
@@ -183,6 +215,11 @@ paths:
       responses:
         200:
           description: Success response
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: 'application/json; charset=utf-8'
           content:
             application/json:
               example:
@@ -190,6 +227,11 @@ paths:
                 message: 'Catatan berhasil diperbarui'
         404:
           description: Not found response
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: 'application/json; charset=utf-8'
           content:
             application/json:
               example:
@@ -205,6 +247,11 @@ paths:
       responses:
           200:
             description: Success response
+            headers:
+              Content-Type:
+                schema:
+                  type: string
+                  example: 'application/json; charset=utf-8'
             content:
               application/json:
                 example:
@@ -212,6 +259,11 @@ paths:
                   message: 'Catatan berhasil dihapus'
           404:
             description: Not found response
+            headers:
+              Content-Type:
+                schema:
+                  type: string
+                  example: 'application/json; charset=utf-8'
             content:
               application/json:
                 example:
