@@ -4,7 +4,7 @@ info:
   description: Notes API Back-End
   version: 1.0.0
 servers:
-  - url: 'http://localhost'
+  - url: 'http://localhost:8000'
 paths:
   /api/notes:
     post:
@@ -25,7 +25,7 @@ paths:
                   type: string
       responses:
         201:
-          description: Success response
+          description: Success created response
           content:
             application/json:
               example:

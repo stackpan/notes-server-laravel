@@ -55,14 +55,12 @@ class NoteTest extends TestCase
     public static function barPayloadsProvider(): array
     {
         return [
-            [
-                ["tags" => ["Android", "Web"], "body" => "Isi dari catatan A"],
-                ["title" => 1, "tags" => ["Android", "Web"], "body" => "Isi dari catatan A"],
-                ["title" => "Catatan A", "body" => "Isi dari catatan A"],
-                ["title" => "Catatan A", "tags" => [1, "2"], "body" => "Isi dari catatan A"],
-                ["title" => "Catatan A", "tags" => ["Android", "Web"]],
-                ["title" => "Catatan A", "tags" => ["Android", "Web"], "body" => true]
-            ]
+            [["tags" => ["Android", "Web"], "body" => "Isi dari catatan A"]],
+            [["title" => 1, "tags" => ["Android", "Web"], "body" => "Isi dari catatan A"]],
+            [["title" => "Catatan A", "body" => "Isi dari catatan A"]],
+            [["title" => "Catatan A", "tags" => [1, "2"], "body" => "Isi dari catatan A"]],
+            [["title" => "Catatan A", "tags" => ["Android", "Web"]]],
+            [["title" => "Catatan A", "tags" => ["Android", "Web"], "body" => true]]
         ];
     }
 
