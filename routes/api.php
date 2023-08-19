@@ -23,3 +23,6 @@ Route::get('/notes', [\App\Http\Controllers\Api\NoteController::class, 'get'])->
 Route::get('/notes/{id}', [\App\Http\Controllers\Api\NoteController::class, 'getDetail'])->name('api.notes.get_detail');
 Route::put('/notes/{id}', [\App\Http\Controllers\Api\NoteController::class, 'update'])->name('api.notes.update');
 Route::delete('/notes/{id}', [\App\Http\Controllers\Api\NoteController::class, 'delete'])->name('api.notes.delete');
+
+Route::post('/users', [\App\Http\Controllers\Api\UserController::class, 'create'])->name('api.users.create');
+Route::get('/users/{id}', [\App\Http\Controllers\Api\UserController::class, 'get'])->name('api.users.get');

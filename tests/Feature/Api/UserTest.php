@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Str;
 use Illuminate\Testing\Fluent\AssertableJson;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -28,12 +29,12 @@ class UserTest extends TestCase
             ->assertHeader('Content-Type', 'application/json; charset=utf-8')
             ->assertJson(fn(AssertableJson $json) => $json
                 ->where('status', 'success')
-                ->has('message')
-                ->where('data.userId', $user->id)
+                ->where('message', 'User berhasil ditambahkan')
+                ->whereType('data.userId', 'string')
             );
 
         $this->assertDatabaseHas('users', [
-            'id' => $user->id,
+            'id' => $response['data']['userId'],
         ]);
     }
 
@@ -78,7 +79,7 @@ class UserTest extends TestCase
             ->assertHeader('Content-Type', 'application/json; charset=utf-8')
             ->assertJson(fn (AssertableJson $json) => $json
                 ->where('status', 'fail')
-                ->whereType('message', 'object')
+                ->has('message')
             );
     }
 
@@ -103,9 +104,7 @@ class UserTest extends TestCase
 
     public function testGetNotFound(): void
     {
-        $user = User::factory()->make();
-
-        $response = $this->get('/api/users/' . $user->id);
+        $response = $this->get('/api/users/' . Str::ulid());
 
         $response
             ->assertNotFound()
