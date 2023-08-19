@@ -20,14 +20,9 @@ class NoteController extends Controller
 
         $note = Note::create([
             'title' => $validated['title'],
-            'body' => $validated['body'] ?? null,
+            'body' => $validated['body'],
+            'tags' => $validated['tags'],
         ]);
-
-        if (isset($validated['tags'])) {
-            foreach ($validated['tags'] as $tag) {
-                $note->tags()->create(['body' => $tag]);
-            }
-        }
 
         return response()
             ->json([
@@ -88,14 +83,11 @@ class NoteController extends Controller
         $note
             ->fill([
                 'title' => $validated['title'],
-                'body' => $validated['body'] ?? null,
+                'body' => $validated['body'],
+                'tags' => $validated['tags']
             ])
             ->save();
 
-        $note->tags()->delete();
-        foreach ($validated['tags'] as $tag) {
-            $note->tags()->create(['body' => $tag]);
-        }
         return response()
             ->json([
                 'status' => 'success',

@@ -22,15 +22,8 @@ class NoteTest extends TestCase
                 'body' => $note['body'],
                 'createdAt' => $note['created_at'],
                 'updatedAt' => $note['updated_at'],
-                'tags' => self::mapTags($note['tags']),
+                'tags' => $note['tags'],
             ]);
-    }
-
-    public static function mapTags(array $tags): array
-    {
-        return collect($tags)
-            ->map(fn(array $item, int $key) => $item['body'])
-            ->toArray();
     }
 
     public function testCreateSuccess(): void
@@ -56,16 +49,7 @@ class NoteTest extends TestCase
 
         $this->assertDatabaseHas('notes', [
             'id' => $noteId,
-            'title' => $payload['title'],
-            'body' => $payload['body'],
         ]);
-
-        foreach ($payload['tags'] as $tag) {
-            $this->assertDatabaseHas('tags', [
-                'body' => $tag,
-                'taggable_id' => $noteId,
-            ]);
-        }
     }
 
     public static function barPayloadsProvider(): array
@@ -120,11 +104,9 @@ class NoteTest extends TestCase
     public function testGetSuccess(): void
     {
         $firstNote = Note::factory()
-            ->hasTags(3)
             ->count(4)
             ->create()
             ->first()
-            ->load('tags')
             ->toArray();
 
         $response = $this
@@ -157,9 +139,7 @@ class NoteTest extends TestCase
     public function testGetDetailSuccess(): void
     {
         $note = Note::factory()
-            ->hasTags(3)
             ->create()
-            ->load('tags')
             ->toArray();
 
         $response = $this
@@ -189,16 +169,14 @@ class NoteTest extends TestCase
     public function testUpdateSuccess(): void
     {
         $note = Note::factory()
-            ->hasTags(3)
             ->create()
-            ->load('tags')
             ->toArray();
 
         $response = $this
             ->put('/api/notes/' . $note['id'], [
                 'title' => $note['title'],
                 'body' => fake()->paragraph(),
-                'tags' => self::mapTags($note['tags']),
+                'tags' => $note['tags'],
             ]);
 
         $response
@@ -208,7 +186,7 @@ class NoteTest extends TestCase
                 ->whereType('message', 'string')
             );
 
-        $updatedNote = Note::find($note['id'])->load('tags')->toArray();
+        $updatedNote = Note::find($note['id'])->toArray();
         $this->assertNotEquals($note, $updatedNote);
     }
 
@@ -216,9 +194,7 @@ class NoteTest extends TestCase
     public function testUpdateWithBadPayloads(array $payload): void
     {
         $note = Note::factory()
-            ->hasTags(3)
             ->create()
-            ->load('tags')
             ->toArray();
 
         $response = $this
@@ -237,16 +213,14 @@ class NoteTest extends TestCase
     public function testUpdateNotFound(): void
     {
         $note = Note::factory()
-            ->hasTags(3)
             ->create()
-            ->load('tags')
             ->toArray();
 
         $response = $this
             ->put('/api/notes/' . Str::ulid(), [
                 'title' => $note['title'],
                 'body' => fake()->paragraph(),
-                'tags' => self::mapTags($note['tags']),
+                'tags' => $note['tags'],
             ]);
 
         $response
@@ -256,14 +230,13 @@ class NoteTest extends TestCase
                 ->whereType('message', 'string')
             );
 
-        $updatedNote = Note::find($note['id'])->load('tags')->toArray();
+        $updatedNote = Note::find($note['id'])->toArray();
         $this->assertEquals($note, $updatedNote);
     }
 
     public function testDeleteSuccess(): void
     {
         $note = Note::factory()
-            ->hasTags(3)
             ->create();
 
         $response = $this
@@ -282,7 +255,6 @@ class NoteTest extends TestCase
     public function testDeleteNotFound(): void
     {
         $note = Note::factory()
-            ->hasTags(3)
             ->create();
 
         $response = $this

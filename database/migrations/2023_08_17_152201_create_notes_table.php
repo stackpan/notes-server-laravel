@@ -15,6 +15,7 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->string('title', 100);
             $table->text('body')->nullable();
+            $table->json('tags');
             $table->timestamps();
         });
     }

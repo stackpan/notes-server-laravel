@@ -18,7 +18,7 @@ class NoteResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'body' => $this->body,
-            'tags' => TagResource::collection($this->tags),
+            'tags' => $this->tags,
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
         ];

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\Json;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,10 +15,15 @@ class Note extends Model
     protected $fillable = [
         'title',
         'body',
+        'tags',
     ];
 
-    public function tags(): MorphMany
-    {
-        return $this->morphMany(Tag::class, 'taggable');
-    }
+    protected $casts = [
+        'tags' => 'array',
+    ];
+
+//    public function tags(): MorphMany
+//    {
+//        return $this->morphMany(Tag::class, 'taggable');
+//    }
 }

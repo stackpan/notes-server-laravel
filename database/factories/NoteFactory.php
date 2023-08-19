@@ -19,6 +19,7 @@ class NoteFactory extends Factory
         return [
             'title' => fake()->sentence(3),
             'body' => fake()->paragraph(),
+            'tags' => fake()->words(3),
         ];
     }
 }
