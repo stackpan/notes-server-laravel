@@ -14,12 +14,8 @@ class NoteTest extends TestCase
 {
     use RefreshDatabase;
 
-    private array $token;
-
-    protected function setUp(): void
+    private function login(): array
     {
-        parent::setUp();
-
         $user = User::factory()->create();
 
         $response = $this->post('/api/authentications', [
@@ -27,7 +23,7 @@ class NoteTest extends TestCase
             'password' => 'password',
         ]);
 
-        $this->token = [
+        return [
             'access_token' => $response['data']['accessToken'],
             'refresh_token' => $response['data']['refreshToken'],
         ];
@@ -35,6 +31,8 @@ class NoteTest extends TestCase
 
     public function testCreateSuccess(): void
     {
+        $token = $this->login();
+
         $payload = [
             'title' => fake()->sentence(3),
             'tags' => fake()->words(2),
@@ -43,7 +41,7 @@ class NoteTest extends TestCase
 
         $response = $this
             ->withHeaders([
-                'Authorization' => 'Bearer ' . $this->token['access_token']
+                'Authorization' => 'Bearer ' . $token['access_token']
             ])
             ->post('/api/notes', $payload);
 
@@ -78,9 +76,11 @@ class NoteTest extends TestCase
     #[DataProvider('barPayloadsProvider')]
     public function testCreateWithBadPayloads(array $payload)
     {
+        $token = $this->login();
+
         $response = $this
             ->withHeaders([
-                'Authorization' => 'Bearer ' . $this->token['access_token']
+                'Authorization' => 'Bearer ' . $token['access_token']
             ])
             ->post('/api/notes', $payload);
 
@@ -98,9 +98,11 @@ class NoteTest extends TestCase
     {
         $this->markTestIncomplete('There is no 500 response configuration ATM.');
 
+        $token = $this->login();
+
         $response = $this
             ->withHeaders([
-                'Authorization' => 'Bearer ' . $this->token['access_token']
+                'Authorization' => 'Bearer ' . $token['access_token']
             ])
             ->post('/api/notes', [
                 'title' => fake()->sentence(3),
@@ -118,6 +120,8 @@ class NoteTest extends TestCase
 
     public function testGetSuccess(): void
     {
+        $token = $this->login();
+
         $firstNote = Note::factory()
             ->count(4)
             ->create()
@@ -126,7 +130,7 @@ class NoteTest extends TestCase
 
         $response = $this
             ->withHeaders([
-                'Authorization' => 'Bearer ' . $this->token['access_token']
+                'Authorization' => 'Bearer ' . $token['access_token']
             ])
             ->get('/api/notes/');
 
@@ -142,9 +146,11 @@ class NoteTest extends TestCase
 
     public function testGetSuccessEmpty(): void
     {
+        $token = $this->login();
+
         $response = $this
             ->withHeaders([
-                'Authorization' => 'Bearer ' . $this->token['access_token']
+                'Authorization' => 'Bearer ' . $token['access_token']
             ])
             ->get('/api/notes/');
 
@@ -161,8 +167,6 @@ class NoteTest extends TestCase
 
     public function testGetUnauthorized(): void
     {
-        $this->markTestSkipped('IDK why it doesn\'t works');
-
         $response = $this->get('/api/notes/');
 
         $response
@@ -172,13 +176,15 @@ class NoteTest extends TestCase
 
     public function testGetDetailSuccess(): void
     {
+        $token = $this->login();
+
         $note = Note::factory()
             ->create()
             ->toArray();
 
         $response = $this
             ->withHeaders([
-                'Authorization' => 'Bearer ' . $this->token['access_token']
+                'Authorization' => 'Bearer ' . $token['access_token']
             ])
             ->get('/api/notes/' . $note['id']);
 
@@ -192,9 +198,11 @@ class NoteTest extends TestCase
 
     public function testGetDetailNotFound(): void
     {
+        $token = $this->login();
+
         $response = $this
             ->withHeaders([
-                'Authorization' => 'Bearer ' . $this->token['access_token']
+                'Authorization' => 'Bearer ' . $token['access_token']
             ])
             ->get('/api/notes/' . Str::ulid());
 
@@ -208,13 +216,15 @@ class NoteTest extends TestCase
 
     public function testUpdateSuccess(): void
     {
+        $token = $this->login();
+
         $note = Note::factory()
             ->create()
             ->toArray();
 
         $response = $this
             ->withHeaders([
-                'Authorization' => 'Bearer ' . $this->token['access_token']
+                'Authorization' => 'Bearer ' . $token['access_token']
             ])
             ->put('/api/notes/' . $note['id'], [
                 'title' => $note['title'],
@@ -236,13 +246,15 @@ class NoteTest extends TestCase
     #[DataProvider('barPayloadsProvider')]
     public function testUpdateWithBadPayloads(array $payload): void
     {
+        $token = $this->login();
+
         $note = Note::factory()
             ->create()
             ->toArray();
 
         $response = $this
             ->withHeaders([
-                'Authorization' => 'Bearer ' . $this->token['access_token']
+                'Authorization' => 'Bearer ' . $token['access_token']
             ])
             ->put('/api/notes/' . $note['id'], $payload);
 
@@ -258,13 +270,15 @@ class NoteTest extends TestCase
 
     public function testUpdateNotFound(): void
     {
+        $token = $this->login();
+
         $note = Note::factory()
             ->create()
             ->toArray();
 
         $response = $this
             ->withHeaders([
-                'Authorization' => 'Bearer ' . $this->token['access_token']
+                'Authorization' => 'Bearer ' . $token['access_token']
             ])
             ->put('/api/notes/' . Str::ulid(), [
                 'title' => $note['title'],
@@ -285,12 +299,14 @@ class NoteTest extends TestCase
 
     public function testDeleteSuccess(): void
     {
+        $token = $this->login();
+
         $note = Note::factory()
             ->create();
 
         $response = $this
             ->withHeaders([
-                'Authorization' => 'Bearer ' . $this->token['access_token']
+                'Authorization' => 'Bearer ' . $token['access_token']
             ])
             ->delete('/api/notes/' . $note->id);
 
@@ -306,12 +322,14 @@ class NoteTest extends TestCase
 
     public function testDeleteNotFound(): void
     {
+        $token = $this->login();
+
         $note = Note::factory()
             ->create();
 
         $response = $this
             ->withHeaders([
-                'Authorization' => 'Bearer ' . $this->token['access_token']
+                'Authorization' => 'Bearer ' . $token['access_token']
             ])
             ->delete('/api/notes/' . Str::ulid());
 
