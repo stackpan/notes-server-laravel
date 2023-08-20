@@ -21,6 +21,7 @@ class NoteResource extends JsonResource
             'tags' => $this->tags,
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
+            'username' => $request->user()->username
         ];
     }
 

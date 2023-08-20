@@ -32,16 +32,12 @@ paths:
                 example: 'application/json; charset=utf-8'
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  accessToken:
-                    type: string
-                  refreshToken:
-                    type: string
-                required:
-                  - accessToken
-                  - refreshToken
+              example:
+                status: success
+                message: Authentication berhasil ditambahkan
+                data:
+                  accessToken: access_token
+                  refreshToken: refresh_token
         401:
           description: Login failed response
           headers:

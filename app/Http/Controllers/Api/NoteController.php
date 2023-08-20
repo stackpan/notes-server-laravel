@@ -31,7 +31,10 @@ class NoteController extends Controller
                 'data' => [
                     'noteId' => $note->id,
                 ]
-            ], 201);
+            ], 201)
+            ->withHeaders([
+                'Content-Type' => 'application/json; charset=utf-8',
+            ]);
     }
 
     public function get(): JsonResponse

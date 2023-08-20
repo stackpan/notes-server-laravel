@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('username', 50)->unique();
             $table->text('password');
             $table->string('fullname', 200);
+            $table->text('refresh_token')->nullable();
         });
     }
 

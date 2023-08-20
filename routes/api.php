@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\NoteController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Middleware\RefreshTokenMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,11 +22,21 @@ use Illuminate\Support\Facades\Route;
 //    return $request->user();
 //});
 
-Route::post('/notes', [\App\Http\Controllers\Api\NoteController::class, 'create'])->name('api.notes.create');
-Route::get('/notes', [\App\Http\Controllers\Api\NoteController::class, 'get'])->name('api.notes.get');
-Route::get('/notes/{id}', [\App\Http\Controllers\Api\NoteController::class, 'getDetail'])->name('api.notes.get_detail');
-Route::put('/notes/{id}', [\App\Http\Controllers\Api\NoteController::class, 'update'])->name('api.notes.update');
-Route::delete('/notes/{id}', [\App\Http\Controllers\Api\NoteController::class, 'delete'])->name('api.notes.delete');
 
-Route::post('/users', [\App\Http\Controllers\Api\UserController::class, 'create'])->name('api.users.create');
-Route::get('/users/{id}', [\App\Http\Controllers\Api\UserController::class, 'get'])->name('api.users.get');
+Route::post('/users', [UserController::class, 'create'])->name('api.users.create');
+Route::get('/users/{id}', [UserController::class, 'get'])->name('api.users.get');
+
+Route::post('/authentications', [AuthController::class, 'login'])->name('api.auth.login');
+
+Route::middleware(RefreshTokenMiddleware::class)->group(function () {
+    Route::put('/authentications', [AuthController::class, 'refresh'])->name('api.auth.refresh');
+    Route::delete('/authentications', [AuthController::class, 'logout'])->name('api.auth.logout');
+});
+
+Route::middleware('auth:api')->group(function () {
+    Route::post('/notes', [NoteController::class, 'create'])->name('api.notes.create');
+    Route::get('/notes', [NoteController::class, 'get'])->name('api.notes.get');
+    Route::get('/notes/{id}', [NoteController::class, 'getDetail'])->name('api.notes.get_detail');
+    Route::put('/notes/{id}', [NoteController::class, 'update'])->name('api.notes.update');
+    Route::delete('/notes/{id}', [NoteController::class, 'delete'])->name('api.notes.delete');
+});
