@@ -179,6 +179,18 @@ paths:
                       - note_tag1
                       - note_tag2
                     body: note_body
+        403:
+          description: Forbidden response
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: 'application/json; charset=utf-8'
+          content:
+            application/json:
+              example:
+                status: fail
+                message: Anda tidak berhak mengakses resource ini
         404:
           description: Not found response
           headers:
@@ -225,6 +237,18 @@ paths:
               example:
                 status: success
                 message: 'Catatan berhasil diperbarui'
+        403:
+          description: Forbidden response
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: 'application/json; charset=utf-8'
+          content:
+            application/json:
+              example:
+                status: fail
+                message: Anda tidak berhak mengakses resource ini
         404:
           description: Not found response
           headers:
@@ -257,6 +281,18 @@ paths:
                 example:
                   status: success
                   message: 'Catatan berhasil dihapus'
+          403:
+            description: Forbidden response
+            headers:
+              Content-Type:
+                schema:
+                  type: string
+                  example: 'application/json; charset=utf-8'
+            content:
+              application/json:
+                example:
+                  status: fail
+                  message: Anda tidak berhak mengakses resource ini
           404:
             description: Not found response
             headers:
