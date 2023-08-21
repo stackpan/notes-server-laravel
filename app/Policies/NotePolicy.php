@@ -14,7 +14,7 @@ class NotePolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -42,7 +42,7 @@ class NotePolicy
      */
     public function create(User $user): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -90,7 +90,7 @@ class NotePolicy
      */
     public function restore(User $user, Note $note): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -98,6 +98,6 @@ class NotePolicy
      */
     public function forceDelete(User $user, Note $note): bool
     {
-        //
+        return true;
     }
 }
