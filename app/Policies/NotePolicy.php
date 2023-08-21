@@ -6,6 +6,7 @@ use Illuminate\Auth\Access\Response;
 use App\Models\Note;
 use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Mockery\Matcher\Not;
 
 class NotePolicy
 {
@@ -22,7 +23,10 @@ class NotePolicy
      */
     public function view(User $user, Note $note): bool
     {
-        if (!$note->user->is($user)) {
+        $isOwner = $note->user->is($user);
+        $isCollaborator = $note->collaborators()->where('user_id', $user->id)->first();
+
+        if (!$isOwner && !$isCollaborator) {
             throw new HttpResponseException(response()
                 ->json([
                     'status' => 'fail',
@@ -50,7 +54,10 @@ class NotePolicy
      */
     public function update(User $user, Note $note): bool
     {
-        if (!$note->user->is($user)) {
+        $isOwner = $note->user->is($user);
+        $isCollaborator = $note->collaborators()->where('user_id', $user->id)->first();
+
+        if (!$isOwner && !$isCollaborator) {
             throw new HttpResponseException(response()
                 ->json([
                     'status' => 'fail',
@@ -98,6 +105,40 @@ class NotePolicy
      */
     public function forceDelete(User $user, Note $note): bool
     {
+        return true;
+    }
+
+    public function addCollaborator(User $user, Note $note): bool
+    {
+        if (!$note->user->is($user)) {
+            throw new HttpResponseException(response()
+                ->json([
+                    'status' => 'fail',
+                    'message' => 'Anda tidak berhak mengakses resource ini'
+                ], 403)
+                ->withHeaders([
+                    'Content-Type' => 'application/json; charset=utf-8',
+                ])
+            );
+        }
+
+        return true;
+    }
+
+    public function removeCollaborator(User $user, Note $note): bool
+    {
+        if (!$note->user->is($user)) {
+            throw new HttpResponseException(response()
+                ->json([
+                    'status' => 'fail',
+                    'message' => 'Anda tidak berhak mengakses resource ini'
+                ], 403)
+                ->withHeaders([
+                    'Content-Type' => 'application/json; charset=utf-8',
+                ])
+            );
+        }
+
         return true;
     }
 }

@@ -12,20 +12,6 @@ class NoteAuthorizationTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function login(User $user): array
-    {
-        $response = $this->post('/api/authentications', [
-            'username' => $user->username,
-            'password' => 'password',
-        ]);
-
-        return [
-            'user' => $user,
-            'access_token' => $response['data']['accessToken'],
-            'refresh_token' => $response['data']['refreshToken'],
-        ];
-    }
-
     public function testCreate(): void
     {
         $users = User::factory(2)->create();
@@ -40,7 +26,7 @@ class NoteAuthorizationTest extends TestCase
             $login = $this->login($user);
 
             $response = $this
-                ->withHeader('Authorization', $login['access_token'])
+                ->withHeader('Authorization', 'Bearer' . $login['access_token'])
                 ->post('/api/notes', $payload);
 
             $response
@@ -68,7 +54,7 @@ class NoteAuthorizationTest extends TestCase
             $notes = $user->notes;
 
             $response = $this
-                ->withHeader('Authorization', $login['access_token'])
+                ->withHeader('Authorization', 'Bearer' . $login['access_token'])
                 ->get('/api/notes');
 
             $response
@@ -85,11 +71,11 @@ class NoteAuthorizationTest extends TestCase
     {
         $users = User::factory(2)->has(Note::factory())->create();
 
-        $userAlogin = $this->login($users->get(0));
+        $userALogin = $this->login($users->get(0));
 
         // send get request to note owned by user B
         $response = $this
-            ->withHeader('Authorization', $userAlogin['access_token'])
+            ->withHeader('Authorization', 'Bearer' . $userALogin['access_token'])
             ->get('/api/notes/' . $users->get(1)->notes->first()->id);
 
         $response
@@ -105,13 +91,13 @@ class NoteAuthorizationTest extends TestCase
     {
         $users = User::factory(2)->has(Note::factory())->create();
 
-        $userAlogin = $this->login($users->get(0));
+        $userALogin = $this->login($users->get(0));
 
         $userBNote = $users->get(1)->notes->first();
 
         // send update request to note owned by user B
         $response = $this
-            ->withHeader('Authorization', $userAlogin['access_token'])
+            ->withHeader('Authorization', 'Bearer' . $userALogin['access_token'])
             ->put('/api/notes/' . $userBNote->id, [
                 'title' => $userBNote->title,
                 'tags' => $userBNote->tags,
@@ -131,11 +117,11 @@ class NoteAuthorizationTest extends TestCase
     {
         $users = User::factory(2)->has(Note::factory())->create();
 
-        $userAlogin = $this->login($users->get(0));
+        $userALogin = $this->login($users->get(0));
 
         // send delete request to note owned by user B
         $response = $this
-            ->withHeader('Authorization', $userAlogin['access_token'])
+            ->withHeader('Authorization', 'Bearer' . $userALogin['access_token'])
             ->delete('/api/notes/' . $users->get(1)->notes->first()->id);
 
         $response
@@ -145,6 +131,20 @@ class NoteAuthorizationTest extends TestCase
                 ->where('status', 'fail')
                 ->has('message')
             );
+    }
+
+    private function login(User $user): array
+    {
+        $response = $this->post('/api/authentications', [
+            'username' => $user->username,
+            'password' => 'password',
+        ]);
+
+        return [
+            'user' => $user,
+            'access_token' => $response['data']['accessToken'],
+            'refresh_token' => $response['data']['refreshToken'],
+        ];
     }
 
 }

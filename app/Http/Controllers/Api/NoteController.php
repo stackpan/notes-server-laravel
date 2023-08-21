@@ -40,7 +40,12 @@ class NoteController extends Controller
 
     public function get(): JsonResponse
     {
-        $notes = auth()->user()->notes;
+        $user = auth()->user();
+
+        $ownedNotes = $user->notes;
+        $collaborationNotes = $user->collaborationNotes;
+
+        $notes = $ownedNotes->concat($collaborationNotes);
 
         return (new NoteCollection($notes))
             ->additional([

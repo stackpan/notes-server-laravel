@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CollaborationController;
 use App\Http\Controllers\Api\NoteController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Middleware\RefreshTokenMiddleware;
@@ -39,4 +40,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/notes/{id}', [NoteController::class, 'getDetail'])->name('api.notes.get_detail');
     Route::put('/notes/{id}', [NoteController::class, 'update'])->name('api.notes.update');
     Route::delete('/notes/{id}', [NoteController::class, 'delete'])->name('api.notes.delete');
+
+    Route::post('/collaborations', [CollaborationController::class, 'create'])->name('api.collaborations.create');
+    Route::delete('/collaborations', [CollaborationController::class, 'delete'])->name('api.collaborations.delete');
 });

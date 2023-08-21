@@ -2,6 +2,7 @@
 
 namespace Api\Note;
 
+use Tests\Util\Note as NoteTestUtil;
 use App\Models\Note;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -138,7 +139,7 @@ class NoteTest extends TestCase
             ->assertJson(fn(AssertableJson $json) => $json
                 ->where('status', 'success')
                 ->whereType('data.notes', 'array')
-                ->has('data.notes', 4, self::noteJsonAsserter($notes->load('user')->first()->toArray()))
+                ->has('data.notes', 4, NoteTestUtil::noteJsonAsserter($notes->load('user')->first()->toArray()))
             );
     }
 
@@ -190,7 +191,7 @@ class NoteTest extends TestCase
             ->assertOk()
             ->assertJson(fn(AssertableJson $json) => $json
                 ->where('status', 'success')
-                ->has('data.note', self::noteJsonAsserter($note->load('user')->toArray()))
+                ->has('data.note', NoteTestUtil::noteJsonAsserter($note->load('user')->toArray()))
             );
     }
 
@@ -341,18 +342,5 @@ class NoteTest extends TestCase
             );
 
         $this->assertModelExists($note);
-    }
-    public static function noteJsonAsserter(array $note): callable
-    {
-        return fn(AssertableJson $json) => $json
-            ->whereAll([
-                'id' => $note['id'],
-                'title' => $note['title'],
-                'body' => $note['body'],
-                'createdAt' => $note['created_at'],
-                'updatedAt' => $note['updated_at'],
-                'tags' => $note['tags'],
-                'username' => $note['user']['username']
-            ]);
     }
 }

@@ -166,6 +166,13 @@ return [
     'custom' => [
         'username' => [
             'unique' => 'Gagal menambahkan user. Username sudah digunakan.'
+        ],
+        'userId' => [
+            'unique' => 'User sudah ditambahkan sebelumnya',
+            'exists' => 'User tidak ada'
+        ],
+        'noteId' => [
+            'exists' => 'Catatan tidak ada'
         ]
     ],
 
