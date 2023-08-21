@@ -18,7 +18,8 @@ class NoteController extends Controller
     {
         $validated = $request->validated();
 
-        $note = Note::create([
+        $user = auth()->user();
+        $note = $user->notes()->create([
             'title' => $validated['title'],
             'body' => $validated['body'],
             'tags' => $validated['tags'],
@@ -39,7 +40,9 @@ class NoteController extends Controller
 
     public function get(): JsonResponse
     {
-        return (new NoteCollection(Note::all()))
+        $notes = auth()->user()->notes;
+
+        return (new NoteCollection($notes))
             ->additional([
                 'status' => 'success',
             ])
@@ -51,15 +54,14 @@ class NoteController extends Controller
 
     public function getDetail(string $id): JsonResponse
     {
-        $note = Note::find($id);
-
-        if (!$note) {
+        if (!$note = Note::find($id)) {
             throw new HttpResponseException(response()->json([
                 'status' => 'fail',
                 'message' => 'Catatan tidak ditemukan'
             ], 404));
         }
 
+        $this->authorize('view', $note);
         return response()
             ->json([
                 'status' => 'success',
@@ -80,6 +82,8 @@ class NoteController extends Controller
                 'message' => 'Gagal memperbarui catatan. Id catatan tidak ditemukan'
             ], 404));
         }
+
+        $this->authorize('update', $note);
 
         $validated = $request->validated();
 
@@ -109,6 +113,8 @@ class NoteController extends Controller
                 'message' => 'Catatan gagal dihapus. Id catatan tidak ditemukan'
             ], 404));
         }
+
+        $this->authorize('delete', $note);
 
         $note->delete();
         return response()
