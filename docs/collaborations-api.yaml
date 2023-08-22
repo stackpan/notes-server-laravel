@@ -9,6 +9,12 @@ paths:
   /api/collaborations:
     post:
       description: Add collaborator
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
       requestBody:
         content:
           application/json:
@@ -76,6 +82,12 @@ paths:
                 message: Anda tidak berhak mengakses resource ini
     delete:
       description: Delete collaborator
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
       requestBody:
         content:
           application/json:

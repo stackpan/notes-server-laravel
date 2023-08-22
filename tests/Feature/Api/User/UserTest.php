@@ -82,6 +82,29 @@ class UserTest extends TestCase
             );
     }
 
+    public function testSearchSuccess(): void
+    {
+        User::factory(2)->create();
+        User::factory()->state([
+            'username' => 'usertestone',
+        ])->create();
+        User::factory()->state([
+            'username' => 'usertesttwo',
+        ])->create();
+
+        $response = $this->get('/api/users?username=test');
+
+        $response
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/json; charset=utf-8')
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->where('status', 'success')
+                ->has('data.users', 2, fn (AssertableJson $json) => $json
+                    ->hasAll(['id', 'username', 'fullname'])
+                )
+            );
+    }
+
     public function testGetSuccess(): void
     {
         $user = User::factory()->create();

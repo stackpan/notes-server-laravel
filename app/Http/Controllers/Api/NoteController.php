@@ -33,9 +33,7 @@ class NoteController extends Controller
                     'noteId' => $note->id,
                 ]
             ], 201)
-            ->withHeaders([
-                'Content-Type' => 'application/json; charset=utf-8',
-            ]);
+            ->header('Content-Type', 'application/json; charset=utf-8');
     }
 
     public function get(): JsonResponse
@@ -52,9 +50,7 @@ class NoteController extends Controller
                 'status' => 'success',
             ])
             ->response()
-            ->withHeaders([
-                'Content-Type' => 'application/json; charset=utf-8',
-            ]);
+            ->header('Content-Type', 'application/json; charset=utf-8');
     }
 
     public function getDetail(string $id): JsonResponse
@@ -74,18 +70,18 @@ class NoteController extends Controller
                     'note' => new NoteResource($note)
                 ]
             ])
-            ->withHeaders([
-                'Content-Type' => 'application/json; charset=utf-8',
-            ]);
+            ->header('Content-Type', 'application/json; charset=utf-8');
     }
 
     public function update(NoteUpdateRequest $request, string $id): JsonResponse
     {
         if (!$note = Note::find($id)) {
-            throw new HttpResponseException(response()->json([
-                'status' => 'fail',
-                'message' => 'Gagal memperbarui catatan. Id catatan tidak ditemukan'
-            ], 404));
+            throw new HttpResponseException(response()
+                ->json([
+                    'status' => 'fail',
+                    'message' => 'Gagal memperbarui catatan. Id catatan tidak ditemukan'
+                ], 404)
+                ->header('Content-Type', 'application/json; charset=utf-8'));
         }
 
         $this->authorize('update', $note);
@@ -105,18 +101,18 @@ class NoteController extends Controller
                 'status' => 'success',
                 'message' => 'Catatan berhasil diperbarui',
             ])
-            ->withHeaders([
-                'Content-Type' => 'application/json; charset=utf-8',
-            ]);
+            ->header('Content-Type', 'application/json; charset=utf-8');
     }
 
     public function delete(string $id): JsonResponse
     {
         if (!$note = Note::find($id)) {
-            throw new HttpResponseException(response()->json([
-                'status' => 'fail',
-                'message' => 'Catatan gagal dihapus. Id catatan tidak ditemukan'
-            ], 404));
+            throw new HttpResponseException(response()
+                ->json([
+                    'status' => 'fail',
+                    'message' => 'Catatan gagal dihapus. Id catatan tidak ditemukan'
+                ], 404)
+                ->header('Content-Type', 'application/json; charset=utf-8'));
         }
 
         $this->authorize('delete', $note);
@@ -127,9 +123,7 @@ class NoteController extends Controller
                 'status' => 'success',
                 'message' => 'Catatan berhasil dihapus',
             ])
-            ->withHeaders([
-                'Content-Type' => 'application/json; charset=utf-8',
-            ]);
+            ->header('Content-Type', 'application/json; charset=utf-8');
     }
 
 }

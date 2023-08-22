@@ -32,9 +32,7 @@ class CollaborationController extends Controller
                     'collaborationId' => $collaboration->id,
                 ],
             ], 201)
-            ->withHeaders([
-                'Content-Type' => 'application/json; charset=utf-8'
-            ]);
+            ->header('Content-Type', 'application/json; charset=utf-8');
     }
 
     public function delete(CollaborationDeleteRequest $request): JsonResponse
@@ -48,15 +46,12 @@ class CollaborationController extends Controller
             ->first();
 
         if (!$collaboration) {
-            throw new HttpResponseException(
-                response()
-                    ->json([
-                        'status' => 'fail',
-                        'message' => 'Kolaborasi tidak ditemukan'
-                    ], 404)
-                    ->withHeaders([
-                        'Content-Type' => 'application/json; charset=utf-8'
-                    ]));
+            throw new HttpResponseException(response()
+                ->json([
+                    'status' => 'fail',
+                    'message' => 'Kolaborasi tidak ditemukan'
+                ], 404)
+                ->header('Content-Type', 'application/json; charset=utf-8'));
         }
 
         $collaboration->delete();
@@ -66,8 +61,6 @@ class CollaborationController extends Controller
                 'status' => 'success',
                 'message' => 'Kolaborasi berhasil dihapus',
             ])
-            ->withHeaders([
-                'Content-Type' => 'application/json; charset=utf-8'
-            ]);
+            ->header('Content-Type', 'application/json; charset=utf-8');
     }
 }

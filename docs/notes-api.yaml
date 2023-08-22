@@ -9,6 +9,12 @@ paths:
   /api/notes:
     post:
       description: Create note
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
       requestBody:
         content:
           application/json:
@@ -52,6 +58,12 @@ paths:
                 message: 'Catatan gagal untuk ditambahkan'
     get:
       description: Getting all notes
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
       responses:
         200:
           description: Success response
@@ -132,6 +144,12 @@ paths:
           name: id
           schema:
             type: string
+          required: true
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
       responses:
         200:
           description: Success response
@@ -210,6 +228,12 @@ paths:
           name: id
           schema:
             type: string
+          required: true
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
       requestBody:
         content:
           application/json:
@@ -268,6 +292,12 @@ paths:
           name: id
           schema:
             type: string
+          required: true
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
       responses:
           200:
             description: Success response

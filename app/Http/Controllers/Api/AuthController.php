@@ -17,16 +17,12 @@ class AuthController extends Controller
         $credentials = $request->validated();
 
         if (!$refreshToken = auth()->attempt($credentials)) {
-            throw new HttpResponseException(
-                response()
-                    ->json([
-                        'status' => 'fail',
-                        'message' => 'Kredensial yang Anda berikan salah'
-                    ], 401)
-                    ->withHeaders([
-                        'Content-Type' => 'application/json; charset=utf-8',
-                    ])
-            );
+            throw new HttpResponseException(response()
+                ->json([
+                    'status' => 'fail',
+                    'message' => 'Kredensial yang Anda berikan salah'
+                ], 401)
+                ->header('Content-Type', 'application/json; charset=utf-8'));
         }
 
         $user = auth()->user();
@@ -45,9 +41,7 @@ class AuthController extends Controller
                     'refreshToken' => $refreshToken,
                 ]
             ], 201)
-            ->withHeaders([
-                'Content-Type' => 'application/json; charset=utf-8',
-            ]);
+            ->header('Content-Type', 'application/json; charset=utf-8');
     }
 
     public function refresh(Request $request)
@@ -62,9 +56,7 @@ class AuthController extends Controller
                     'accessToken' => $accessToken,
                 ]
             ])
-            ->withHeaders([
-                'Content-Type' => 'application/json; charset=utf-8',
-            ]);
+            ->header('Content-Type', 'application/json; charset=utf-8');
     }
 
     public function logout(Request $request)
@@ -80,8 +72,6 @@ class AuthController extends Controller
                 'status' => 'success',
                 'message' => 'Refresh token berhasil dihapus',
             ])
-            ->withHeaders([
-                'Content-Type' => 'application/json; charset=utf-8',
-            ]);
+            ->header('Content-Type', 'application/json; charset=utf-8');
     }
 }

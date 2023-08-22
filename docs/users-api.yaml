@@ -57,6 +57,62 @@ paths:
                       username: 'username is required'
                       password: 'password is required'
                       fullname: 'fullname is required'
+    get:
+      description: Search user
+      parameters:
+        - in: query
+          name: username
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Search success
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: 'application/json; charset=utf-8'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    required:
+                      - users
+                    properties:
+                      users:
+                        type: array
+                        items:
+                          type: object
+                          required:
+                            - id
+                            - username
+                            - fullname
+                          properties:
+                            id:
+                              type: string
+                            username:
+                              type: string
+                            fullname:
+                              type: string
+              example:
+                status: success
+                data:
+                  users:
+                    - id: user1_id
+                      username: user1_username
+                      fullname: user1_fullname
+                    - id: user2_id
+                      username: user2_username
+                      fullname: user2_fullname
   /api/users/{id}:
     get:
       description: Get user info

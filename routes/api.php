@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::post('/users', [UserController::class, 'create'])->name('api.users.create');
+Route::get('/users/', [UserController::class, 'search'])->name('api.users.search');
 Route::get('/users/{id}', [UserController::class, 'get'])->name('api.users.get');
 
 Route::post('/authentications', [AuthController::class, 'login'])->name('api.auth.login');

@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserCreateRequest;
+use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -30,9 +32,25 @@ class UserController extends Controller
                     'userId' => $user->id,
                 ]
             ], 201)
-            ->withHeaders([
-                'Content-Type' => 'application/json; charset=utf-8',
-            ]);
+            ->header('Content-Type', 'application/json; charset=utf-8');
+    }
+
+    public function search(Request $request): JsonResponse
+    {
+        $query = User::query();
+
+        if ($username = $request->input('username')) {
+            $query->where('username', 'like', '%' . $username . '%');
+        }
+
+        $users = $query->get();
+
+        return response()
+            ->json([
+                'status' => 'success',
+                'data' => new UserCollection($users),
+            ])
+            ->header('Content-Type', 'application/json; charset=utf-8');
     }
 
     public function get(string $id): JsonResponse
@@ -45,9 +63,7 @@ class UserController extends Controller
                     'status' => 'fail',
                     'message' => 'User tidak ditemukan'
                 ], 404)
-                ->withHeaders([
-                    'Content-Type' => 'application/json; charset=utf-8'
-                ])
+                ->header('Content-Type', 'application/json; charset=utf-8'),
             );
         }
 
@@ -58,8 +74,6 @@ class UserController extends Controller
                     'user' => new UserResource($user),
                 ]
             ])
-            ->withHeaders([
-                'Content-Type' => 'application/json; charset=utf-8',
-            ]);
+            ->header('Content-Type', 'application/json; charset=utf-8');
     }
 }
