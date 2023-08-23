@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CollaborationController;
 use App\Http\Controllers\Api\NoteController;
+use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ExportController;
 use App\Http\Middleware\RefreshTokenMiddleware;
@@ -30,6 +31,8 @@ Route::get('/users/', [UserController::class, 'search'])->name('api.users.search
 Route::get('/users/{id}', [UserController::class, 'get'])->name('api.users.get');
 
 Route::post('/authentications', [AuthController::class, 'login'])->name('api.auth.login');
+
+Route::post('/upload/images', [UploadController::class, 'uploadImage'])->name('api.upload.images');
 
 Route::middleware(RefreshTokenMiddleware::class)->group(function () {
     Route::put('/authentications', [AuthController::class, 'refresh'])->name('api.auth.refresh');
