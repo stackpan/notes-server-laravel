@@ -44,6 +44,7 @@ class NoteCollaborationTest extends TestCase
             ->assertHeader('Content-Type', 'application/json; charset=utf-8')
             ->assertJson(fn(AssertableJson $json) => $json
                 ->where('status', 'success')
+                ->has('message')
                 ->has('data.collaborationId')
             );
 

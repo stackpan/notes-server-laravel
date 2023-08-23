@@ -28,6 +28,7 @@ class CollaborationController extends Controller
         return response()
             ->json([
                 'status' => 'success',
+                'message' => 'Berhasil menambahkan kolaborator',
                 'data' => [
                     'collaborationId' => $collaboration->id,
                 ],
