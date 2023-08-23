@@ -11,6 +11,7 @@ use App\Models\Note;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class NoteController extends Controller
 {
@@ -40,10 +41,18 @@ class NoteController extends Controller
     {
         $user = auth()->user();
 
-        $ownedNotes = $user->notes;
-        $collaborationNotes = $user->collaborationNotes;
-
-        $notes = $ownedNotes->concat($collaborationNotes);
+        $notes = $user->notes()
+            ->leftJoin('collaborations', 'collaborations.note_id', '=', 'notes.id')
+            ->orWhere('collaborations.user_id', $user->id)
+            ->get([
+                'notes.id',
+                'notes.user_id',
+                'notes.title',
+                'notes.tags',
+                'notes.body',
+                'notes.created_at',
+                'notes.updated_at',
+            ]);
 
         return (new NoteCollection($notes))
             ->additional([

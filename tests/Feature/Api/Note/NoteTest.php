@@ -131,7 +131,7 @@ class NoteTest extends TestCase
             ->withHeaders([
                 'Authorization' => 'Bearer ' . $login['access_token']
             ])
-            ->get('/api/notes/');
+            ->get('/api/notes');
 
         $response
             ->assertOk()

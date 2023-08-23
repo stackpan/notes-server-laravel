@@ -2,11 +2,14 @@
 
 namespace App\Exceptions;
 
+use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Throwable;
@@ -45,5 +48,17 @@ class Handler extends ExceptionHandler
 
             throw new HttpResponseException($response);
         });
+
+        $this->renderable(function (Throwable $e) {
+            if ($e instanceof HttpResponseException) {
+                return $e->getResponse();
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message'=> 'Maaf, terjadi kegagalan pada server kami.'
+            ], 500);
+        });
     }
+
 }

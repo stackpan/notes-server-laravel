@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CollaborationController;
 use App\Http\Controllers\Api\NoteController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ExportController;
 use App\Http\Middleware\RefreshTokenMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -44,4 +45,6 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/collaborations', [CollaborationController::class, 'create'])->name('api.collaborations.create');
     Route::delete('/collaborations', [CollaborationController::class, 'delete'])->name('api.collaborations.delete');
+
+    Route::post('/export/notes', [ExportController::class, 'exportNotes'])->name('api.exports.notes');
 });
