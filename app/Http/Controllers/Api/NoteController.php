@@ -11,7 +11,9 @@ use App\Models\Note;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
 
 class NoteController extends Controller
 {
@@ -25,6 +27,8 @@ class NoteController extends Controller
             'body' => $validated['body'],
             'tags' => $validated['tags'],
         ]);
+
+        Cache::forget('notes:user:' . $user->id);
 
         return response()
             ->json([
@@ -41,18 +45,20 @@ class NoteController extends Controller
     {
         $user = auth()->user();
 
-        $notes = $user->notes()
-            ->leftJoin('collaborations', 'collaborations.note_id', '=', 'notes.id')
-            ->orWhere('collaborations.user_id', $user->id)
-            ->get([
-                'notes.id',
-                'notes.user_id',
-                'notes.title',
-                'notes.tags',
-                'notes.body',
-                'notes.created_at',
-                'notes.updated_at',
-            ]);
+        $notes = Cache::remember('notes:user:' . $user->id, 300, fn() => $user
+                ->notes()
+                ->leftJoin('collaborations', 'collaborations.note_id', '=', 'notes.id')
+                ->orWhere('collaborations.user_id', $user->id)
+                ->get([
+                    'notes.id',
+                    'notes.user_id',
+                    'notes.title',
+                    'notes.tags',
+                    'notes.body',
+                    'notes.created_at',
+                    'notes.updated_at',
+                ])
+            );
 
         return (new NoteCollection($notes))
             ->additional([
@@ -64,7 +70,7 @@ class NoteController extends Controller
 
     public function getDetail(string $id): JsonResponse
     {
-        if (!$note = Note::find($id)) {
+        if (!$note = Cache::remember('notes:' . $id, 300, fn() => Note::find($id))) {
             throw new HttpResponseException(response()->json([
                 'status' => 'fail',
                 'message' => 'Catatan tidak ditemukan'
@@ -105,6 +111,9 @@ class NoteController extends Controller
             ])
             ->save();
 
+        Cache::put('notes:' . $note->id, $note, 300);
+        Cache::forget('notes:user:' . $note->user->id);
+
         return response()
             ->json([
                 'status' => 'success',
@@ -127,6 +136,10 @@ class NoteController extends Controller
         $this->authorize('delete', $note);
 
         $note->delete();
+
+        Cache::forget('notes:' . $note->id);
+        Cache::forget('notes:user:' . $note->user->id);
+
         return response()
             ->json([
                 'status' => 'success',

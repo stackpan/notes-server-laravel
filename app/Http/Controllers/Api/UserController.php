@@ -10,7 +10,9 @@ use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redis;
 
 class UserController extends Controller
 {
@@ -55,9 +57,7 @@ class UserController extends Controller
 
     public function get(string $id): JsonResponse
     {
-        $user = User::find($id);
-
-        if (!$user) {
+        if (!$user = Cache::remember('users:' . $id, 300, fn() => User::find($id))) {
             throw new HttpResponseException(response()
                 ->json([
                     'status' => 'fail',

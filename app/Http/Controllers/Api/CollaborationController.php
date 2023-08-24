@@ -10,6 +10,8 @@ use App\Models\Note;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 class CollaborationController extends Controller
 {
@@ -24,6 +26,8 @@ class CollaborationController extends Controller
             'note_id' => $validated['noteId'],
             'user_id' => $validated['userId'],
         ]);
+
+        Cache::forget('notes:user:' . $validated['userId']);
 
         return response()
             ->json([
@@ -56,6 +60,7 @@ class CollaborationController extends Controller
         }
 
         $collaboration->delete();
+        Cache::forget('notes:user:' . $validated['userId']);
 
         return response()
             ->json([
