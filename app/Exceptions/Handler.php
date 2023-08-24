@@ -54,10 +54,12 @@ class Handler extends ExceptionHandler
                 return $e->getResponse();
             }
 
-//            return response()->json([
-//                'status' => 'error',
-//                'message'=> 'Maaf, terjadi kegagalan pada server kami.'
-//            ], 500);
+            if (!config('app.debug')) {
+                return response()->json([
+                    'status' => 'error',
+                    'message'=> 'Maaf, terjadi kegagalan pada server kami.'
+                ], 500);
+            }
         });
     }
 
