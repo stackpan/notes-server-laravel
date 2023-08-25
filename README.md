@@ -1,66 +1,213 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Notes API Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Dicoding notes app the backend project, but it's powered by laravel.
 
-## About Laravel
+## Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This project was made using Laravel 10.
+Like general backend applications, it can process a request and send a
+response, store into a database and cache it (we use [Redis](https://redis.io) for caching),
+authenticate request & authorize resource
+(we use [JWT](https://jwt.io/)), process queue job, send emails, store images, etc.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+For the application feature, we build it according to
+the [original project](https://github.com/dicodingacademy/a271-backend-menengah-labs).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Usage
 
-## Learning Laravel
+We have documented the [OpenAPI spec](https://swagger.io/specification/) of the app.
+You can
+check [here](https://github.com/stackpan/notes-server-laravel/tree/main/docs).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## How to Run
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Docker (recommended)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+This method is preferred. Because it can make your life easier.
 
-## Laravel Sponsors
+You just need Docker and its stuff like Docker Compose is installed to your machine.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+After that, clone this repo and `cd` to it:
 
-### Premium Partners
+```
+git clone https://github.com/stackpan/notes-server-laravel
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+We already made a preconfigured `docker-compose.yaml` file in the root project.
+In this file, we have prepared some service configuration that will be ready to run.
+Like `mariadb` for the database, `redis` for server side caching service, `mailpit` for SMTP testing server.
+And, there is already have a frontend service in it, this is cool.
+Isn't it?
 
-## Contributing
+This is the advantage of using this method. You don't need to bother thinking about the support services.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+You can change the docker compose configuration if you want.
 
-## Code of Conduct
+Next, what you need to do is just set some `.env` values.
+You can get the template from the `.env.example` file by copying it.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```shell
+cp .env.example .env
+```
 
-## Security Vulnerabilities
+We recommend filling these keys:
+```dotenv
+# Your database name
+DB_DATABASE=
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Your database credentials
+DB_USERNAME=
+DB_PASSWORD=
 
-## License
+# Your root user database password
+DB_ROOT_PASSWORD=
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# You can change it as you wish, if you want to
+MAIL_FROM_ADDRESS=
+```
+
+For other environment keys, you can check it on the docker compose file
+
+If you're already done, let's start the containers:
+```shell
+docker compose up -d
+```
+
+### Manual Installation
+
+Just like the Laravel app, you need these things installed to your machine:
+
+- [PHP 8.1](https://www.php.net/releases/8.1/en.php),
+  with [required extensions for Laravel](https://laravel.com/docs/10.x/deployment#server-requirements)
+- [Composer](https://getcomposer.org/)
+- [RDBMS](https://en.wikipedia.org/wiki/Relational_database) Server like one of
+  these: [MySQL](https://www.mysql.com/), [MariaDB](https://mariadb.com/),
+  or [PostgreSQL](https://www.postgresql.org/) (select one)
+- [Redis](https://redis.io/) Server
+- [SMTP](https://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol) Server (real or testing).
+  For testing, you can use
+  one of these: [mailpit](https://github.com/axllent/mailpit), [mailtrap](https://mailtrap.io/inboxes), etc.
+
+
+After you ready for all the required things above, follow these steps:
+
+1. Clone this repo & `cd` to it
+
+    ```shell
+    git clone https://github.com/stackpan/notes-server-laravel
+    ```
+
+2. Fill out the `.env` file. You can copy the template from `.env.example` file
+
+    ```shell
+    cp .env.example .env
+    ```
+
+   You just have to fill some of them:
+    ```dotenv
+    # It should be 'true' or 'false'
+    # The default is 'false' for production mode
+    APP_DEBUG=
+
+    # This server address
+    # Example: 'http://example.com', 'http://localhost', 'http://localhost:8000', 'http://172.16.0.10'
+    # It must be declared
+    # If the port is other than 80, you MUST declared it explicitly
+    # If you are using via our preconfigured docker compose, you can skip it
+    APP_URL=
+    ```
+
+    ```dotenv
+    # Set to 'mysql' if you are gonna use MySQL or MariaDB
+    # Set to 'pgsql' if you are gonna use PostgreSQL
+    DB_CONNECTION=
+
+    # Your database server address
+    # Example: 'http://mydbaddr', 'http://localhost', 'http://172.16.0.11'
+    # If you are using via our preconfigured docker compose, you can skip it
+    DB_HOST=
+
+    # The default is 3306. For PostgreSQL, the default is 5432
+    DB_PORT=
+
+    # Your database name
+    DB_DATABASE=
+
+    # Your database credentials
+    DB_USERNAME=
+    DB_PASSWORD=
+    ```
+
+    ```dotenv
+    # Your Redis server address
+    # Example: 'http://myredisaddr', 'http://localhost', 'http://172.16.0.13'
+    # If you are using via our preconfigured docker compose, you can skip it
+    REDIS_HOST=
+
+    # Your Redis password
+    # You can leave it blank if you don't set the password
+    REDIS_PASSWORD=
+
+    # The default Redis port is 6379
+    REDIS_PORT=
+    ```
+
+    ```dotenv
+    # Your SMTP server address
+    # Example: 'http://mysmtpaddr', 'http://localhost', 'http://172.16.0.14'
+    # If you are using via our preconfigured docker compose, you can skip it
+    MAIL_HOST=
+
+    # Your SMTP server port
+    MAIL_PORT=
+
+    # Your SMTP server credentials
+    # You can blank it if you dont set the credentials
+    MAIL_USERNAME=
+    MAIL_PASSWORD=
+    MAIL_ENCRYPTION=
+
+    # You can change it as you wish, if you want to
+    MAIL_FROM_ADDRESS=
+    ```
+
+3. Install the dependencies using Composer
+
+    ```shell
+    composer install --optimize-autoloader --no-dev
+    ```
+
+4. Generate app keys and JWT secrets
+
+    ```shell
+    php artisan key:generate
+ 
+    echo yes | php artisan jwt:secret
+    ```
+
+5. Generate app caches
+
+    ```shell
+    php artisan route:cache
+
+    php artisan view:cache
+   
+    php artisan config:cache
+    ```
+   
+6. Run database migration
+
+    ```shell
+    php artisan migrate:fresh
+    ```
+
+7. And finally, run the app
+    
+    ```shell
+    php artisan serve --host=0.0.0.0 --port=<THIS_APP_PORT> & php artisan queue:work -v
+    ```
+
+#### Frontend Service
+
+To install the frontend service,
+clone [this repository](https://github.com/stackpan/notes-client) and follow the instructions inside it.
