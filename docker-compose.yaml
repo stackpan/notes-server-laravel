@@ -1,0 +1,84 @@
+version: '3'
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: server
+    restart: unless-stopped
+    tty: true
+    environment:
+      APP_ENV: '${APP_ENV}'
+      APP_DEBUG: '${APP_DEBUG:-false}'
+      APP_URL: '${APP_URL:-http://localhost:9000}'
+      DB_HOST: '${DB_HOST:-mariadb}'
+      DB_DATABASE: '${DB_DATABASE}'
+      DB_USERNAME: '${DB_USERNAME}'
+      DB_PASSWORD: '${DB_PASSWORD:-secret}'
+      REDIS_HOST: '${REDIS_HOST:-0.0.0.0}'
+    working_dir: /app
+    command: ["sh", "run.sh"]
+    depends_on:
+      - mariadb
+      - redis
+    ports:
+      - 9000:9000
+    networks:
+      - app-network
+  client:
+    build: https://github.com/stackpan/notes-client.git
+    container_name: client
+    restart: unless-stopped
+    tty: true
+    environment:
+      NEXT_PUBLIC_SERVER_URL: '${CLIENT_NEXT_PUBLIC_SERVER_URL:-http://localhost:9000/api/}'
+    command: ["sh", "run.sh"]
+    depends_on:
+      - server
+    ports:
+      - 80:8000
+    networks:
+      - app-network
+  mariadb:
+    image: mariadb:lts
+    container_name: mariadb
+    restart: unless-stopped
+    tty: true
+    environment:
+      MARIADB_ROOT_PASSWORD: '${DB_ROOT_PASSWORD:-Secret123!}'
+      MARIADB_DATABASE: '${DB_DATABASE}'
+      MARIADB_USER: '${DB_USERNAME}'
+      MARIADB_PASSWORD: '${DB_PASSWORD:-secret}'
+    volumes:
+      - db-data:/var/lib/mysql/
+    networks:
+      - app-network
+  redis:
+    image: redis:7.2.0-alpine
+    container_name: redis
+    restart: unless-stopped
+    tty: true
+    networks:
+      - app-network
+  smtp:
+    image: axllent/mailpit:v1.8
+    container_name: smtp
+    restart: unless-stopped
+    environment:
+      MP_DATA_FILE: /data/mailpit.db
+      TZ: Asia/Jakarta
+    volumes:
+      - mailpit-data:/data
+    ports:
+      - 8025:8025
+      - 1025:1025
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
+volumes:
+  db-data:
+    driver: local
+  mailpit-data:
+    driver: local
