@@ -73,6 +73,11 @@ If you're already done, let's start the containers:
 docker compose up -d
 ```
 
+Don't forget to migrate the database if you don't have one:
+```shell
+docker exec server php artisan migrate:fresh
+```
+
 ### Manual Installation
 
 Just like the Laravel app, you need these things installed to your machine:

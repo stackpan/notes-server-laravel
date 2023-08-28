@@ -1,9 +1,10 @@
 {
-    "name": "laravel/laravel",
+    "name": "stackpan/notes-server-laravel",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Dicoding notes app backend server but powered by Laravel 10 ",
+    "version": "3.1.0",
     "keywords": ["laravel", "framework"],
-    "license": "MIT",
+    "license": "GPL-3.0-or-later",
     "require": {
         "php": "^8.1",
         "guzzlehttp/guzzle": "^7.2",
